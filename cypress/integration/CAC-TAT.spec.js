@@ -40,7 +40,7 @@ describe('Central de Atendimento ao Cliente TAT', function(){
         cy.get('#firstName').type(user.firstName);
         cy.get('#lastName').type(user.lastName);
         cy.get('#email').type(user.email);
-        cy.get('#phone-checkbox').click();
+        cy.get('#phone-checkbox').check();
         cy.get('#open-text-area').type(user.openTextArea);
         cy.contains('button', 'Enviar').click();
         cy.get('.error').should('be.visible');
@@ -79,21 +79,85 @@ describe('Central de Atendimento ao Cliente TAT', function(){
         cy.get('.success').should('be.visible');
     })
 
-    it.only('select "YouTube" prodct by text', () => {
+    it('select "YouTube" prodct by text', () => {
         cy.get('#product')
             .select('YouTube')
             .should('have.value','youtube');
     })
 
-    it.only('select "Mentoria" product by value', () => {
+    it('select "Mentoria" product by value', () => {
         cy.get('#product')
             .select('mentoria')
             .should('have.value', 'mentoria');
     })
 
-    it.only('select "Blog" by index', () => {
+    it('select "Blog" by index', () => {
         cy.get('#product')
             .select(1)
             .should('have.value', 'blog');
     })
+
+    it('check type of service', () => {
+        cy.get('input[type="radio"]')
+            .check('feedback')
+            .should('have.value', 'feedback');
+    })
+
+    it('check each type of service', () => {
+        cy.get('input[type="radio"]')
+            .should('have.length', 3)
+            .each(function($radio) {
+                cy.wrap($radio)
+                .check()
+                .should('be.checked')
+            });
+    })
+
+    it('check both checkbox and uncheck last', () => {
+        cy.get('input[type="checkbox"]')
+            .check()
+            .last()
+            .uncheck()
+            .should('not.be.checked');
+    })
+
+    it('select file', () => {
+        cy.get('#file-upload')
+            .selectFile('cypress/fixtures/example.json')
+            .then($input => {
+                expect($input[0].files[0].name).to.equal('example.json')
+            })
+    })
+
+    it('select file - drag and drop action', () => {
+        cy.get('#file-upload')
+            .selectFile('cypress/fixtures/example.json', { action:'drag-drop' })
+            .then($input => {
+                expect($input[0].files[0].name).to.equal('example.json')
+            })            
+    })
+    it('select file using an alias', () => {
+        cy.fixture('example.json', { encoding:null }).as('exampleFile')
+        cy.get('#file-upload')
+            .selectFile('@exampleFile')
+            .then($input => {
+                expect($input[0].files[0].name).to.equal('example.json')
+            })
+    })
+
+    it('verify "política de privacidade" link without click', () => {
+        cy.get('#privacy a').should('have.attr','target','_blank')
+    })
+    
+    it('open a new link in the same tab', () => {
+        cy.get('#privacy a')
+            .invoke('removeAttr', 'target')
+            .click()
+            .url()
+            .should('contain','/privacy.html')
+        cy.contains('CAC TAT - Política de privacidade')
+            .should('be.visible')
+    })
+
+    
 })
