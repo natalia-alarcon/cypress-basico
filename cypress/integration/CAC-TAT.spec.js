@@ -159,5 +159,9 @@ describe('Central de Atendimento ao Cliente TAT', function(){
             .should('be.visible')
     })
 
-    
+    it.only('find the cat', () => {
+        cy.contains('🐈')
+        .invoke('show')
+        .should('be.visible');
+    })
 })
